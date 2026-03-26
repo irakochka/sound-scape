@@ -1,14 +1,38 @@
 <script setup lang="ts">
 import AppIcon from './AppIcon.vue'
+import type { Scene } from '@/interfaces/scene.interface.ts'
+
+interface Props {
+  scenes: Scene[]
+  activeScene: Scene
+}
+
+interface Emits {
+  selectScene: [scene: Scene]
+}
+
+defineProps<Props>()
+const emits = defineEmits<Emits>()
 </script>
 
 <template>
   <div class="scene-tabs">
     <span class="scene-tabs__label">Scene</span>
 
-    <button class="scene-tabs__item">
-      <span class="scene-tabs__icon">💚</span>
-      The Sims 2
+    <button
+      v-for="scene in scenes"
+      :key="scene.id"
+      class="scene-tabs__item"
+      :class="{ 'scene-tabs__item--active': scene.id === activeScene.id }"
+      :style="{
+        borderColor: scene.id === activeScene.id ? scene.accentColor + '55' : undefined,
+        background: scene.id === activeScene.id ? scene.accentColor + '18' : undefined,
+        color: scene.id === activeScene.id ? scene.accentColor : undefined,
+      }"
+      @click="emits('selectScene', scene)"
+    >
+      <span class="scene-tabs__icon">{{ scene.icon }}</span>
+      {{ scene.label }}
     </button>
 
     <button class="scene-tabs__fullscreen">
@@ -67,6 +91,10 @@ import AppIcon from './AppIcon.vue'
   transition: all var(--transition-normal);
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.scene-tabs__item--active {
+  /* colors set inline via :style */
 }
 
 .scene-tabs__icon {

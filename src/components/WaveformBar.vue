@@ -1,23 +1,71 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { formatTime } from '@/utils/formatTime.ts'
+
+interface Props {
+  elapsed: number
+  totalSec: number
+  duration: string
+  accentColor: string
+}
+
+interface Emits {
+  seek: [percent: number]
+}
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
+
+const elapsedFormatted = computed(() => formatTime(props.elapsed))
+
+// Pre-generate waveform bar heights (deterministic seed-like approach)
+const bars = Array.from({ length: 120 }, (_, i) => {
+  const h = 8 + Math.sin(i * 0.3) * 12 + Math.cos(i * 0.7) * 8 + (((i * 7 + 13) % 17) / 17) * 6
+  return Math.max(15, Math.min(90, h * 2.2))
+})
+
+const progress = computed(() => (props.totalSec > 0 ? (props.elapsed / props.totalSec) * 100 : 0))
+
+function clickBarHandler(event: MouseEvent) {
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const percent = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
+  emits('seek', percent)
+}
 </script>
 
 <template>
   <div class="waveform">
     <!-- кликабельная область с барами -->
-    <div class="waveform__track">
+    <div class="waveform__track" @click="clickBarHandler">
       <!-- 120 столбиков -->
       <div class="waveform__bars">
-        <div class="waveform__bar" />
+        <div
+          v-for="(h, i) in bars"
+          :key="i"
+          class="waveform__bar"
+          :style="{
+            height: h + '%',
+            background: (i / bars.length) * 100 < progress ? accentColor : 'rgba(255,255,255,0.08)',
+            opacity: (i / bars.length) * 100 < progress ? 0.5 + (i / bars.length) * 0.5 : 0.6,
+          }"
+        />
       </div>
 
       <!-- вертикальная линия-playhead -->
-      <div class="waveform__playhead" />
+      <div
+        class="waveform__playhead"
+        :style="{
+          left: progress + '%',
+          background: accentColor,
+          boxShadow: `0 0 8px ${accentColor}`,
+        }"
+      />
     </div>
 
     <!-- время -->
     <div class="waveform__times">
-      <span>0:00</span>
-      <span>3:12:44</span>
+      <span>{{ elapsedFormatted }}</span>
+      <span>{{ duration }}</span>
     </div>
   </div>
 </template>

@@ -1,28 +1,37 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { Scene } from '@/interfaces/scene.interface.ts'
+
+interface Props {
+  scene: Scene
+  isPlaying: boolean
+}
+
+defineProps<Props>()
+</script>
 
 <template>
   <div class="video-area">
-    <!-- слой 1: градиентный фон -->
+    <!-- градиентный фон -->
     <div class="video-area__bg" />
 
-    <!-- слой 2: видео -->
+    <!-- видео -->
     <div class="video-area__particles">
       <div class="video-area__particle" />
     </div>
 
-    <!-- слой 3: центральная инфо -->
+    <!-- центральная инфо -->
     <div class="video-area__center">
-      <div class="video-area__scene-icon">💚</div>
-      <div class="video-area__scene-label">The Sims 2</div>
+      <div class="video-area__scene-icon">{{ scene.icon }}</div>
+      <div class="video-area__scene-label">{{ scene.label }}</div>
 
       <!-- пульс при воспроизведении -->
-      <div class="video-area__pulse" />
+      <div v-if="isPlaying" class="video-area__pulse" :style="{ borderColor: scene.accentColor }"/>
     </div>
 
-    <!-- слой 4: бейдж типа контента -->
+    <!-- бейдж типа контента -->
     <div class="video-area__badge">
       <span class="video-area__badge-dot" />
-      type
+      {{ scene.type }}
     </div>
   </div>
 </template>

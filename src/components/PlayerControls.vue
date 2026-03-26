@@ -1,26 +1,56 @@
 <script setup lang="ts">
 import AppIcon from '@/components/AppIcon.vue'
+import type { Track } from '@/interfaces/track.interface.ts'
+
+interface Props {
+  track: Track
+  accentColor: string
+  isPlaying: boolean
+  volume: number
+}
+
+interface Emits {
+  togglePlay: []
+  next: []
+  prev: []
+  updateVolume: [volume: number]
+}
+
+defineProps<Props>()
+const emits = defineEmits<Emits>()
+
+function volumeInputHandler(event: InputEvent) {
+  emits('updateVolume', Number((event.target as HTMLInputElement).value))
+}
 </script>
 
 <template>
   <div class="controls">
     <!-- левая часть: инфо о треке -->
     <div class="controls__info">
-      <div class="controls__title">Sims 2 OST</div>
-      <div class="controls__artist">Mark Mothersbaugh</div>
+      <div class="controls__title">{{ track.label }}</div>
+      <div class="controls__artist">{{ track.artist }}</div>
     </div>
 
     <!-- центр: кнопки воспроизведения -->
     <div class="controls__playback">
-      <button class="controls__btn">
+      <button class="controls__btn" @click="emits('prev')">
         <AppIcon name="prev" :size="18" />
       </button>
 
-      <button class="controls__btn controls__btn--play">
-        <AppIcon name="play" :size="28" />
+      <button
+        class="controls__btn controls__btn--play"
+        :style="{
+          background: accentColor + '20',
+          borderColor: accentColor + '30',
+          color: accentColor,
+        }"
+        @click="emits('togglePlay')"
+      >
+        <AppIcon :name="isPlaying ? 'pause' : 'play'" :size="28" />
       </button>
 
-      <button class="controls__btn">
+      <button class="controls__btn" @click="emits('next')">
         <AppIcon name="next" :size="18" />
       </button>
     </div>
@@ -28,7 +58,17 @@ import AppIcon from '@/components/AppIcon.vue'
     <!-- правая часть: громкость -->
     <div class="controls__volume">
       <AppIcon name="volume" :size="14" />
-      <input type="range" min="0" max="100" class="controls__volume-slider" />
+      <input
+        :value="volume"
+        :style="{
+          background: `linear-gradient(to right, ${accentColor}88 ${volume}%, rgba(255,255,255,0.1) ${volume}%)`,
+        }"
+        @input="volumeInputHandler"
+        type="range"
+        min="0"
+        max="100"
+        class="controls__volume-slider"
+      />
     </div>
   </div>
 </template>

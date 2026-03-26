@@ -1,12 +1,37 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { Track } from '@/interfaces/track.interface.ts'
+
+interface Props {
+  tracks: Track[]
+  activeTrack: Track
+  accentColor: string
+}
+
+interface Emits {
+  selectTrack: [track: Track]
+}
+
+defineProps<Props>()
+const emits = defineEmits<Emits>()
+</script>
 
 <template>
   <div class="music-tabs">
     <span class="music-tabs__label">Music</span>
 
-    <button class="music-tabs__item">
-      Sims 2 OST
-      <span class="music-tabs__duration"> 3:12:44 </span>
+    <button
+      v-for="track in tracks"
+      :key="track.id"
+      class="music-tabs__item"
+      :class="{ 'music-tabs__item--active': track.id === activeTrack.id }"
+      :style="{
+        background: track.id === activeTrack.id ? accentColor + '20' : undefined,
+        color: track.id === activeTrack.id ? accentColor : undefined,
+      }"
+      @click="emits('selectTrack', track)"
+    >
+      {{ track.label }}
+      <span class="music-tabs__duration"> {{ track.duration }} </span>
     </button>
   </div>
 </template>

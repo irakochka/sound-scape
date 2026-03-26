@@ -2,7 +2,7 @@ export interface Scene {
   id: string
   label: string
   icon: string
-  accent: string
+  accentColor: string
   gradient: string
   type: string
 }
