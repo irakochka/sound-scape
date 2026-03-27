@@ -7,7 +7,7 @@ export const tracksData: Track[] = [
     duration: '4:23',
     totalSec: 263,
     artist: 'Mark Mothersbaugh',
-    src: '/audio/the-sims-2.mp3',
+    src: '/sound-scape/audio/the-sims-2.mp3',
   },
   {
     id: 'jazz',
@@ -15,7 +15,7 @@ export const tracksData: Track[] = [
     duration: '2:35',
     totalSec: 155,
     artist: 'Approaching Mars',
-    src: '/audio/forest.mp3',
+    src: '/sound-scape/audio/forest.mp3',
   },
   {
     id: 'ambient',
@@ -23,7 +23,7 @@ export const tracksData: Track[] = [
     duration: '2:38',
     totalSec: 158,
     artist: 'Lantern',
-    src: '/audio/fireplace.mp3',
+    src: '/sound-scape/audio/fireplace.mp3',
   },
   {
     id: 'lofi',
@@ -31,6 +31,6 @@ export const tracksData: Track[] = [
     duration: '4:50',
     totalSec: 290,
     artist: 'Machina',
-    src: '/audio/space.mp3',
+    src: '/sound-scape/audio/space.mp3',
   },
 ]
