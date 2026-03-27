@@ -1,8 +1,10 @@
 <script setup lang="ts">
-defineProps({
-  name: { type: String, required: true },
-  size: { type: Number, default: 18 },
-})
+type IconName = keyof typeof icons
+
+defineProps<{
+  name: IconName
+  size?: number
+}>()
 
 const icons = {
   play: 'M8 5v14l11-7z',
