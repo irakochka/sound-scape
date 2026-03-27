@@ -4,4 +4,5 @@ export interface Track {
   duration: string
   totalSec: number
   artist: string
+  src: string
 }

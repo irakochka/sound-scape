@@ -5,4 +5,5 @@ export interface Scene {
   accentColor: string
   gradient: string
   type: string
+  src: string
 }

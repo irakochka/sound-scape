@@ -2,11 +2,12 @@
 import VideoArea from '@/components/VideoArea.vue'
 import SceneTabs from '@/components/SceneTabs.vue'
 import AudioBar from '@/components/AudioBar.vue'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import type { Scene } from '@/interfaces/scene.interface.ts'
 import { scenesData } from '@/data/scenes.ts'
 import { tracksData } from '@/data/tracks.ts'
 import type { Track } from '@/interfaces/track.interface.ts'
+import { useAudioPlayer } from '@/composables/useAudioPlayer.ts'
 
 // Данные
 const scenes = scenesData
@@ -15,35 +16,13 @@ const tracks = tracksData
 // Реактивные переменные
 const activeScene = ref<Scene>(scenes[0]!)
 const activeTrack = ref<Track>(tracks[0]!)
-const isPlaying = ref<boolean>(false)
-const volume = ref<number>(70) // звук
-const elapsed = ref(0) // сколько секунд трека уже проиграло
+
+const { isPlaying, elapsed, volume, loadTrack, togglePlay, seek, setVolume } = useAudioPlayer()
+
+loadTrack(tracks[0]!.src!)
 
 // Получаем текущий акцентный цвет
 const accentColor = computed(() => activeScene.value.accentColor)
-
-// fake playback timer (UI-only, no real audio) ───
-let playTimer: number | null = null
-
-function startTimer() {
-  stopTimer()
-  playTimer = setInterval(() => {
-    elapsed.value = elapsed.value >= activeTrack.value.totalSec ? 0 : elapsed.value + 1
-  }, 1000)
-}
-
-function stopTimer() {
-  if (playTimer) {
-    clearInterval(playTimer)
-    playTimer = null
-  }
-}
-
-watch(isPlaying, (val) => {
-  val ? startTimer() : stopTimer()
-})
-
-onBeforeUnmount(() => stopTimer())
 
 function onSelectScene(scene: Scene) {
   activeScene.value = scene
@@ -51,32 +30,30 @@ function onSelectScene(scene: Scene) {
 
 function onSelectTrack(track: Track) {
   activeTrack.value = track
-  elapsed.value = 0
-  if (!isPlaying.value) isPlaying.value = true
-}
-
-function onTogglePlay() {
-  isPlaying.value = !isPlaying.value
+  if (track.src) {
+    loadTrack(track.src)
+    setTimeout(() => togglePlay(), 100)
+  }
 }
 
 function onNextTrack() {
   const idx = tracks.findIndex((t) => t.id === activeTrack.value.id)
-  activeTrack.value = tracks[(idx + 1 + tracks.length) % tracks.length]!
-  elapsed.value = 0
+  const track = tracks[(idx + 1) % tracks.length]!
+  activeTrack.value = track
+  if (track.src) {
+    loadTrack(track.src)
+    setTimeout(() => togglePlay(), 100)
+  }
 }
 
 function onPrevTrack() {
   const idx = tracks.findIndex((t) => t.id === activeTrack.value.id)
-  activeTrack.value = tracks[(idx - 1 + tracks.length) % tracks.length]!
-  elapsed.value = 0
-}
-
-function onSeek(percent: number) {
-  elapsed.value = Math.floor(percent * activeTrack.value.totalSec)
-}
-
-function onUpdateVolume(vol: number) {
-  volume.value = vol
+  const track = tracks[(idx - 1 + tracks.length) % tracks.length]!
+  activeTrack.value = track
+  if (track.src) {
+    loadTrack(track.src)
+    setTimeout(() => togglePlay(), 100)
+  }
 }
 </script>
 
@@ -94,11 +71,11 @@ function onUpdateVolume(vol: number) {
       :volume="volume"
       :elapsed="elapsed"
       @select-track="onSelectTrack"
-      @toggle-play="onTogglePlay"
+      @toggle-play="togglePlay"
       @prev="onPrevTrack"
       @next="onNextTrack"
-      @seek="onSeek"
-      @update-volume="onUpdateVolume"
+      @seek="seek"
+      @update-volume="setVolume"
     />
   </div>
 </template>

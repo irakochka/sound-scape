@@ -14,9 +14,9 @@ defineProps<Props>()
     <!-- градиентный фон -->
     <div class="video-area__bg" />
 
-    <!-- видео -->
+    <!-- видео/фото -->
     <div class="video-area__particles">
-      <div class="video-area__particle" />
+      <img :src="scene.src" class="video-area__preview" alt="">
     </div>
 
     <!-- центральная инфо -->
@@ -61,6 +61,13 @@ defineProps<Props>()
   position: absolute;
   inset: 0;
   overflow: hidden;
+}
+
+.video-area__preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .5;
 }
 
 .video-area__particle {
